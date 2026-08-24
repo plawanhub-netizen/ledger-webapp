@@ -29,6 +29,39 @@
    - `anon public` key
 6. (แนะนำ) ไปที่ **Authentication > Providers > Email** เปิด "Confirm email" ถ้าอยากให้ผู้ใช้ยืนยันอีเมลก่อนเข้าระบบ
 
+### เปิดใช้งานล็อกอินด้วย Google (Gmail)
+
+**ก. สร้าง OAuth Client บน Google Cloud Console**
+1. ไปที่ [console.cloud.google.com](https://console.cloud.google.com) สร้างโปรเจกต์ใหม่ (หรือใช้โปรเจกต์เดิม)
+2. ไปที่เมนู **APIs & Services > OAuth consent screen** ตั้งค่าเบื้องต้น (ชื่อแอป, อีเมลติดต่อ) เลือก User type เป็น **External** แล้วกด Save
+3. ไปที่ **APIs & Services > Credentials** กด **Create Credentials > OAuth client ID**
+4. เลือก Application type เป็น **Web application**
+5. ที่ช่อง **Authorized redirect URIs** ใส่ URL นี้ (แทน `xxxxxxxxxxxx` ด้วย project ref ของคุณจาก Supabase):
+   ```
+   https://xxxxxxxxxxxx.supabase.co/auth/v1/callback
+   ```
+   (หา URL นี้แบบเป๊ะๆ ได้จากหน้า Supabase ในขั้นตอน ข ด้านล่าง — Supabase จะโชว์ให้คัดลอกพอดี)
+6. กด **Create** จะได้ **Client ID** และ **Client Secret** มา เก็บไว้
+
+**ข. เปิดใช้งานใน Supabase**
+1. ใน Supabase Dashboard ไปที่ **Authentication > Providers**
+2. หา **Google** ในรายการ กดเปิดใช้งาน (toggle on)
+3. ใส่ **Client ID** และ **Client Secret** ที่ได้จากขั้นตอน ก.
+4. หน้านี้จะมี **Callback URL (for OAuth)** แสดงให้คัดลอก — เอาไปใส่ในช่อง Authorized redirect URIs ของ Google Cloud Console (ขั้นตอน ก.5) ให้ตรงกัน
+5. กด **Save**
+
+**ค. ตั้งค่า Site URL ใน Supabase (สำคัญ ไม่งั้น redirect หลังล็อกอินจะผิด)**
+1. ไปที่ **Authentication > URL Configuration**
+2. ตั้ง **Site URL** เป็น URL จริงของเว็บคุณ เช่น `https://mymoney.com` (หรือ `https://ledger-webapp.vercel.app` ถ้ายังไม่มีโดเมน)
+3. ที่ช่อง **Redirect URLs** เพิ่ม URL เหล่านี้ (ใส่ทั้ง localhost ไว้ทดสอบ และโดเมนจริง):
+   ```
+   http://localhost:3000/auth/callback
+   https://ledger-webapp.vercel.app/auth/callback
+   https://mymoney.com/auth/callback
+   ```
+
+หลังตั้งค่าครบ ทดสอบกดปุ่ม "เข้าสู่ระบบด้วย Google" ในหน้าเว็บ ควรเด้งไปหน้าเลือกบัญชี Gmail แล้ววกกลับมาเข้าแอปได้เลย
+
 ---
 
 ## ขั้นตอนที่ 2 — รันทดสอบบนเครื่องตัวเอง
